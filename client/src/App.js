@@ -1,67 +1,66 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import Register from './components/Register';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from "./contexts/AuthContext"
 
 
-toast.configure(); 
+toast.configure();
 
 function App() {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const setAuth = boolean => {
-    setIsAuthenticated(boolean);
-  };
+  const { user, isAuthenticated, setIsAuthenticated, setUser } = useAuth()
 
   return (
     <Fragment>
       <Router>
+        {!isAuthenticated && <Redirect to='/login' />}
         <div className="container">
+          <button onClick={() => setIsAuthenticated(!isAuthenticated)}>{isAuthenticated ? 'Logout' : 'Login'}</button>
           <Switch>
             <Route
               exact
               path="/login"
-              render={ props =>
+              render={props =>
                 !isAuthenticated ? (
-                  <Login { ...props } setAuth={setAuth} />
+                  <Login {...props} setAuth={setIsAuthenticated} />
                 ) : (
-                  <Redirect to="/dashboard" />
-                )
+                    <Redirect to="/dashboard" />
+                  )
               }
             />
 
             <Route
               exact
               path="/register"
-              render={ props =>
+              render={props =>
                 !isAuthenticated ? (
-                  <Register { ...props } setAuth={setAuth} />
+                  <Register {...props} setAuth={setIsAuthenticated} />
                 ) : (
-                  <Redirect to="/dashboard" />
-                )
+                    <Redirect to="/dashboard" />
+                  )
               }
             />
 
             <Route
               exact
               path="/dashboard"
-              render={ props =>
+              render={props =>
                 !isAuthenticated ? (
-                  <Dashboard { ...props } setAuth={setAuth} />
+                  <Dashboard {...props} setAuth={setIsAuthenticated} />
                 ) : (
-                  <Redirect to="/login" />
-                )
+                    <Redirect to="/login" />
+                  )
               }
             />
           </Switch>
         </div>
       </Router>
-    </Fragment>
+    </Fragment >
   );
 }
 
